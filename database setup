@@ -1,0 +1,10 @@
+# Step by step creation of the database
+
+# creates the database
+create database employee_attendance;
+use employee_attendance;
+
+# creates a table
+create table admin (
+admin_id int
+);
