@@ -4,7 +4,36 @@
 create database employee_attendance;
 use employee_attendance;
 
-# creates a table
+# creates admin
 create table admin (
 admin_id int
+);
+
+# modifies table
+alter table admin
+add email varchar(30),
+add coordinator varchar (30);
+
+# assigns primary key to admin_id
+alter table admin
+add constraint 
+primary key (admin_id);
+
+# assigns auto_increment
+alter table admin
+modify admin_id int auto_increment;
+
+# creates professor
+create table professor (
+id int primary key auto_increment,
+email varchar (30),
+telefon varchar (30)
+);
+
+# creates clock in/out
+create table clock_in_out (
+id int primary key auto_increment,
+creation_date timestamp,
+clock_in boolean,
+status enum('em análise', 'concluído')
 );
