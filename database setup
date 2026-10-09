@@ -1,39 +1,53 @@
-# Step by step creation of the database
+import sqlite3
 
-# creates the database
-create database employee_attendance;
-use employee_attendance;
+connection = sqlite3.connect('database.db')
+connection.execute("PRAGMA foreign_keys = ON")
+cursor = connection.cursor()
 
-# creates admin
-create table admin (
-admin_id int
-);
+#Cria tabela professor
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS PROFESSOR (
+    email VARCHAR(100) NOT NULL PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL,
+    telefone VARCHAR(20),
+    coordenacao VARCHAR(50)
+        )
+    """
+)
 
-# modifies table
-alter table admin
-add email varchar(30),
-add coordinator varchar (30);
+#Cria tabela Coordenador/agente de apoio
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS COORDENADOR_E_AGENTE(
+    email VARCHAR(100) NOT NULL PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL,
+    eh_agente BOOLEAN NOT NULL
+        )
+    """
+)
 
-# assigns primary key to admin_id
-alter table admin
-add constraint 
-primary key (admin_id);
+#Cria a tabela diretor
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS DIRETOR (
+    email VARCHAR(100) NOT NULL PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL
+            )
+    """
+)
 
-# assigns auto_increment
-alter table admin
-modify admin_id int auto_increment;
+#Cria tabela ponto
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS PONTO (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    data_criacao DATE NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    tipo_ponto BOOLEAN NOT NULL,
+    criador VARCHAR(100) NOT NULL,
+    responsavel VARCHAR(100),
+    FOREIGN KEY (criador) REFERENCES PROFESSOR (email),
+    FOREIGN KEY (responsavel) REFERENCES COORDENADOR_E_AGENTE (email)
+        )
+    """
+)
 
-# creates professor
-create table professor (
-id int primary key auto_increment,
-email varchar (30),
-telefon varchar (30)
-);
-
-# creates clock in/out
-create table clock_in_out (
-id int primary key auto_increment,
-creation_date timestamp,
-clock_in boolean,
-status enum('em análise', 'concluído')
-);
+connection.commit()
+connection.close()
