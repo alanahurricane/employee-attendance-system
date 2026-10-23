@@ -1,0 +1,476 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de pontos agentes</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            min-height: 100vh;
+            padding: 3%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: block;
+            width: 220px;
+            max-width: 70%;
+            height: auto;
+            margin: 0 auto 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #272121;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .caixa-tabela {
+            background-color: #e6e6e6;
+            width: 100%;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .area-tabela {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        thead {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #cccccc;
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:hover {
+            background-color: #eeeeee;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pendente {
+            background-color: #fff0cc;
+            color: #805b00;
+        }
+
+        .analisado {
+            background-color: #d9ead3;
+            color: #274e13;
+        }
+
+        .botoes-apontamento {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-presente {
+            background-color: #38761d;
+        }
+
+        .btn-presente:hover {
+            background-color: #274e13;
+        }
+
+        .btn-atraso {
+            background-color: #bf9000;
+        }
+
+        .btn-atraso:hover {
+            background-color: #7f6000;
+        }
+
+        .btn-falta {
+            background-color: #8e0e0e;
+        }
+
+        .btn-falta:hover {
+            background-color: #6d0b0b;
+        }
+
+        .decisao {
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: #38761d;
+            white-space: nowrap;
+        }
+
+        .rodape {
+            margin-top: 20px;
+            color: #333333;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.conteudo-visivel {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-conteudo h2 {
+            color: #272121;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-conteudo p {
+            color: #333333;
+            line-height: 1.5;
+        }
+
+        .modal-botoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancelar {
+            background-color: #cccccc;
+            color: #272121;
+        }
+
+        .btn-confirmar {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #272121;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5%;
+            }
+
+            .logo {
+                width: 180px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .caixa-tabela {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img
+            src="../static/Logo.png"
+            alt="Logo da ETEC"
+            class="logo"
+        >
+
+        <header>
+            <h1>Análise de Pontos Eletrônicos</h1>
+            <p class="subtitulo">
+                Acompanhamento dos registros de ponto dos professores
+            </p>
+        </header>
+
+        <main class="caixa-tabela">
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome do professor</th>
+                            <th>Coordenação</th>
+                            <th>Status da análise</th>
+                            <th>Data e horário de criação</th>
+                            <th>Tipo de ponto</th>
+                            <th>Apontamento</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Mariana Oliveira</td>
+                            <td>Informática</td>
+                            <td>
+                                <span class="status pendente" id="status-1">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>22/10/2026 08:15:32</td>
+                            <td>Entrada</td>
+                            <td id="apontamento-1">
+                                <div class="botoes-apontamento">
+                                    <button type="button"
+                                        class="btn btn-presente"
+                                        onclick="solicitarConfirmacao(1, 'Presente', 'Mariana Oliveira')">
+                                        Presente
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-atraso"
+                                        onclick="solicitarConfirmacao(1, 'Atraso', 'Mariana Oliveira')">
+                                        Atraso
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-falta"
+                                        onclick="solicitarConfirmacao(1, 'Falta', 'Mariana Oliveira')">
+                                        Falta
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Roberto Almeida</td>
+                            <td>Administração</td>
+                            <td>
+                                <span class="status pendente" id="status-2">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>21/10/2026 14:42:10</td>
+                            <td>Saída</td>
+                            <td id="apontamento-2">
+                                <div class="botoes-apontamento">
+                                    <button type="button"
+                                        class="btn btn-presente"
+                                        onclick="solicitarConfirmacao(2, 'Presente', 'Roberto Almeida')">
+                                        Presente
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-atraso"
+                                        onclick="solicitarConfirmacao(2, 'Atraso', 'Roberto Almeida')">
+                                        Atraso
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-falta"
+                                        onclick="solicitarConfirmacao(2, 'Falta', 'Roberto Almeida')">
+                                        Falta
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Fernanda Santos</td>
+                            <td>Desenvolvimento de Sistemas</td>
+                            <td>
+                                <span class="status pendente" id="status-3">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>20/10/2026 09:30:45</td>
+                            <td>Entrada</td>
+                            <td id="apontamento-3">
+                                <div class="botoes-apontamento">
+                                    <button type="button"
+                                        class="btn btn-presente"
+                                        onclick="solicitarConfirmacao(3, 'Presente', 'Fernanda Santos')">
+                                        Presente
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-atraso"
+                                        onclick="solicitarConfirmacao(3, 'Atraso', 'Fernanda Santos')">
+                                        Atraso
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-falta"
+                                        onclick="solicitarConfirmacao(3, 'Falta', 'Fernanda Santos')">
+                                        Falta
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="rodape">
+                Exibindo 3 registros de até 25 por página
+            </p>
+        </main>
+    </div>
+
+    <div
+        class="modal"
+        id="modalConfirmacao"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloModal"
+        aria-describedby="mensagemConfirmacao">
+
+        <div class="modal-conteudo">
+            <h2 id="tituloModal">Confirmar apontamento</h2>
+
+            <p id="mensagemConfirmacao"></p>
+
+            <div class="modal-botoes">
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    onclick="fecharModal()">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-confirmar"
+                    onclick="confirmarApontamento()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let registroSelecionado = null;
+        let apontamentoSelecionado = null;
+
+        function solicitarConfirmacao(id, apontamento, professor) {
+            registroSelecionado = id;
+            apontamentoSelecionado = apontamento;
+
+            document.getElementById("mensagemConfirmacao").textContent =
+                `Deseja realmente registrar "${apontamento}" para ${professor}?`;
+
+            document.getElementById("modalConfirmacao")
+                .classList.add("conteudo-visivel");
+        }
+
+        function fecharModal() {
+            document.getElementById("modalConfirmacao")
+                .classList.remove("conteudo-visivel");
+
+            registroSelecionado = null;
+            apontamentoSelecionado = null;
+        }
+
+        function confirmarApontamento() {
+            if (
+                registroSelecionado === null ||
+                apontamentoSelecionado === null
+            ) {
+                return;
+            }
+
+            const id = registroSelecionado;
+
+            const status = document.getElementById(`status-${id}`);
+            status.textContent = "Analisado pelo agente";
+            status.className = "status analisado";
+
+            const celulaApontamento =
+                document.getElementById(`apontamento-${id}`);
+
+            celulaApontamento.replaceChildren();
+
+            const resultado = document.createElement("span");
+            resultado.className = "decisao";
+            resultado.textContent = apontamentoSelecionado;
+
+            celulaApontamento.appendChild(resultado);
+
+            fecharModal();
+        }
+
+        document.getElementById("modalConfirmacao")
+            .addEventListener("click", function(event) {
+                if (event.target === this) {
+                    fecharModal();
+                }
+            });
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                fecharModal();
+            }
+        });
+    </script>
+</body>
+</html>
+```
