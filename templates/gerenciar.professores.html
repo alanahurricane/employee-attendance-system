@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Professores</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            min-height: 100vh;
+            padding: 3%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: block;
+            width: 300%;
+            max-width: 200px;
+            min-width: 60px;
+            margin: 0 auto 5%;
+            height: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #272121;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .caixa-tabela {
+            background-color: #e6e6e6;
+            width: 100%;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .cabecalho-tabela {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 18px;
+        }
+
+        .area-tabela {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        thead {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #cccccc;
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:hover {
+            background-color: #eeeeee;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-adicionar {
+            background-color: #38761d;
+        }
+
+        .btn-adicionar:hover {
+            background-color: #274e13;
+        }
+
+        .btn-editar {
+            background-color: #8e0e0e;
+        }
+
+        .btn-editar:hover {
+            background-color: #6d0b0b;
+        }
+
+        .btn-excluir {
+            background-color: #666666;
+        }
+
+        .btn-excluir:hover {
+            background-color: #444444;
+        }
+
+        .acoes {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .rodape {
+            margin-top: 20px;
+            color: #333333;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .vazio {
+            text-align: center;
+            color: #666666;
+            padding: 25px;
+        }
+
+        /* Pop-ups */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.conteudo-visivel {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background-color: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+
+        .modal-conteudo h2 {
+            color: #272121;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-conteudo p {
+            color: #333333;
+            line-height: 1.5;
+        }
+
+        .campo {
+            margin-bottom: 16px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 6px;
+            color: #272121;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 0.95rem;
+            background-color: white;
+        }
+
+        .campo input:focus,
+        .campo select:focus {
+            outline: 2px solid #8e0e0e;
+            outline-offset: 1px;
+        }
+
+        .modal-botoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancelar {
+            background-color: #cccccc;
+            color: #272121;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #b5b5b5;
+        }
+
+        .btn-confirmar {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #6d0b0b;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #272121;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5%;
+            }
+
+            .logo {
+                width: 180px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .caixa-tabela {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+
+            .modal-conteudo {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+    <img src="../static/Logo.png"
+     alt="Logo"
+     class="logo">
+    
+        <h1>Gestão de Professores</h1>
+        <p class="subtitulo">
+            Consulte, adicione, edite ou remova professores.
+        </p>
+
+        <div class="caixa-tabela">
+            <div class="cabecalho-tabela">
+                <button class="btn btn-adicionar" id="btnAdicionar">
+                    + Adicionar professor
+                </button>
+            </div>
+
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>E-mail</th>
+                            <th>Coordenação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaProfessores"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="rodape">
+            Total de professores: <span id="totalProfessores">0</span>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar ou editar professor -->
+    <div class="modal" id="modalFormulario" role="dialog"
+         aria-modal="true" aria-labelledby="tituloFormulario">
+        <div class="modal-conteudo">
+            <h2 id="tituloFormulario">Adicionar professor</h2>
+
+            <form id="formProfessor">
+                <div class="campo">
+                    <label for="nome">Nome completo</label>
+                    <input type="text" id="nome" name="nome"
+                           autocomplete="name" required>
+                </div>
+
+                <div class="campo">
+                    <label for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" name="telefone"
+                           autocomplete="tel" required>
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email"
+                           autocomplete="email" required>
+                </div>
+
+                <div class="campo">
+                    <label for="coordenacao">Coordenação</label>
+                    <input type="text" id="coordenacao" name="coordenacao"
+                           required>
+                </div>
+
+                <div class="modal-botoes">
+                    <button type="button" class="btn btn-cancelar"
+                            id="btnCancelarFormulario">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-confirmar">
+                        Continuar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação -->
+    <div class="modal" id="modalConfirmacao" role="alertdialog"
+         aria-modal="true" aria-labelledby="tituloConfirmacao">
+        <div class="modal-conteudo">
+            <h2 id="tituloConfirmacao">Confirmar ação</h2>
+            <p id="mensagemConfirmacao"></p>
+
+            <div class="modal-botoes">
+                <button class="btn btn-cancelar" id="btnCancelarConfirmacao">
+                    Cancelar
+                </button>
+                <button class="btn btn-confirmar" id="btnConfirmarAcao">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let professores = [];
+        let indiceEdicao = null;
+        let acaoPendente = null;
+        let dadosPendentes = null;
+
+        const modalFormulario = document.getElementById('modalFormulario');
+        const modalConfirmacao = document.getElementById('modalConfirmacao');
+        const formProfessor = document.getElementById('formProfessor');
+
+        const campos = {
+            nome: document.getElementById('nome'),
+            telefone: document.getElementById('telefone'),
+            email: document.getElementById('email'),
+            coordenacao: document.getElementById('coordenacao')
+        };
+
+        function abrirModal(modal) {
+            modal.classList.add('conteudo-visivel');
+        }
+
+        function fecharModal(modal) {
+            modal.classList.remove('conteudo-visivel');
+        }
+
+        function limparFormulario() {
+            formProfessor.reset();
+            indiceEdicao = null;
+        }
+
+        document.getElementById('btnAdicionar').addEventListener('click', () => {
+            limparFormulario();
+            document.getElementById('tituloFormulario').textContent =
+                'Adicionar professor';
+
+            abrirModal(modalFormulario);
+            campos.nome.focus();
+        });
+
+        document.getElementById('btnCancelarFormulario')
+            .addEventListener('click', () => {
+                fecharModal(modalFormulario);
+                limparFormulario();
+            });
+
+        formProfessor.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            dadosPendentes = {
+                nome: campos.nome.value.trim(),
+                telefone: campos.telefone.value.trim(),
+                email: campos.email.value.trim(),
+                coordenacao: campos.coordenacao.value.trim()
+            };
+
+            if (indiceEdicao === null) {
+                acaoPendente = 'adicionar';
+                document.getElementById('tituloConfirmacao').textContent =
+                    'Confirmar cadastro';
+                document.getElementById('mensagemConfirmacao').textContent =
+                    `Deseja adicionar ${dadosPendentes.nome} à lista de professores?`;
+                document.getElementById('btnConfirmarAcao').textContent =
+                    'Adicionar';
+            } else {
+                acaoPendente = 'editar';
+                document.getElementById('tituloConfirmacao').textContent =
+                    'Confirmar alterações';
+                document.getElementById('mensagemConfirmacao').textContent =
+                    `Deseja salvar as alterações dos dados de ${dadosPendentes.nome}?`;
+                document.getElementById('btnConfirmarAcao').textContent =
+                    'Salvar alterações';
+            }
+
+            fecharModal(modalFormulario);
+            abrirModal(modalConfirmacao);
+        });
+
+        function editarProfessor(indice) {
+            indiceEdicao = indice;
+            const professor = professores[indice];
+
+            campos.nome.value = professor.nome;
+            campos.telefone.value = professor.telefone;
+            campos.email.value = professor.email;
+            campos.coordenacao.value = professor.coordenacao;
+
+            document.getElementById('tituloFormulario').textContent =
+                'Editar professor';
+
+            abrirModal(modalFormulario);
+            campos.nome.focus();
+        }
+
+        function excluirProfessor(indice) {
+            const professor = professores[indice];
+
+            acaoPendente = 'excluir';
+            indiceEdicao = indice;
+            dadosPendentes = null;
+
+            document.getElementById('tituloConfirmacao').textContent =
+                'Excluir professor';
+            document.getElementById('mensagemConfirmacao').textContent =
+                `Tem certeza de que deseja excluir ${professor.nome}? Esta ação não poderá ser desfeita.`;
+            document.getElementById('btnConfirmarAcao').textContent =
+                'Excluir';
+
+            abrirModal(modalConfirmacao);
+        }
+
+        document.getElementById('btnConfirmarAcao')
+            .addEventListener('click', () => {
+                if (acaoPendente === 'adicionar') {
+                    professores.push(dadosPendentes);
+                }
+
+                if (acaoPendente === 'editar') {
+                    professores[indiceEdicao] = dadosPendentes;
+                }
+
+                if (acaoPendente === 'excluir') {
+                    professores.splice(indiceEdicao, 1);
+                }
+
+                fecharModal(modalConfirmacao);
+                limparFormulario();
+                renderizarTabela();
+
+                acaoPendente = null;
+                dadosPendentes = null;
+            });
+
+        document.getElementById('btnCancelarConfirmacao')
+            .addEventListener('click', () => {
+                fecharModal(modalConfirmacao);
+                acaoPendente = null;
+                dadosPendentes = null;
+            });
+
+        function criarCelula(texto) {
+            const td = document.createElement('td');
+            td.textContent = texto;
+            return td;
+        }
+
+        function renderizarTabela() {
+            const tabela = document.getElementById('tabelaProfessores');
+            tabela.replaceChildren();
+
+            if (professores.length === 0) {
+                const linha = document.createElement('tr');
+                const celula = document.createElement('td');
+
+                celula.colSpan = 5;
+                celula.className = 'vazio';
+                celula.textContent = 'Nenhum professor cadastrado.';
+
+                linha.appendChild(celula);
+                tabela.appendChild(linha);
+            } else {
+                professores.forEach((professor, indice) => {
+                    const linha = document.createElement('tr');
+
+                    linha.appendChild(criarCelula(professor.nome));
+                    linha.appendChild(criarCelula(professor.telefone));
+                    linha.appendChild(criarCelula(professor.email));
+                    linha.appendChild(criarCelula(professor.coordenacao));
+
+                    const celulaAcoes = document.createElement('td');
+                    const botoes = document.createElement('div');
+                    botoes.className = 'acoes';
+
+                    const btnEditar = document.createElement('button');
+                    btnEditar.type = 'button';
+                    btnEditar.className = 'btn btn-editar';
+                    btnEditar.textContent = 'Editar';
+                    btnEditar.addEventListener('click', () => {
+                        editarProfessor(indice);
+                    });
+
+                    const btnExcluir = document.createElement('button');
+                    btnExcluir.type = 'button';
+                    btnExcluir.className = 'btn btn-excluir';
+                    btnExcluir.textContent = 'Excluir';
+                    btnExcluir.addEventListener('click', () => {
+                        excluirProfessor(indice);
+                    });
+
+                    botoes.append(btnEditar, btnExcluir);
+                    celulaAcoes.appendChild(botoes);
+                    linha.appendChild(celulaAcoes);
+                    tabela.appendChild(linha);
+                });
+            }
+
+            document.getElementById('totalProfessores').textContent =
+                professores.length;
+        }
+
+        // Fecha os pop-ups ao clicar fora de seu conteúdo.
+        [modalFormulario, modalConfirmacao].forEach(modal => {
+            modal.addEventListener('click', event => {
+                if (event.target === modal) {
+                    fecharModal(modal);
+
+                    if (modal === modalFormulario) {
+                        limparFormulario();
+                    }
+
+                    if (modal === modalConfirmacao) {
+                        acaoPendente = null;
+                        dadosPendentes = null;
+                    }
+                }
+            });
+        });
+
+        // Fecha o pop-up com a tecla Escape.
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                if (modalConfirmacao.classList.contains('conteudo-visivel')) {
+                    fecharModal(modalConfirmacao);
+                    acaoPendente = null;
+                    dadosPendentes = null;
+                } else if (modalFormulario.classList.contains('conteudo-visivel')) {
+                    fecharModal(modalFormulario);
+                    limparFormulario();
+                }
+            }
+        });
+
+        renderizarTabela();
+    </script>
+</body>
+</html>
