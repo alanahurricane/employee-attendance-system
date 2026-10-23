@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de pontos agentes</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            min-height: 100vh;
+            padding: 3%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: block;
+            width: 220px;
+            max-width: 70%;
+            height: auto;
+            margin: 0 auto 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #272121;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .caixa-tabela {
+            background-color: #e6e6e6;
+            width: 100%;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .area-tabela {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        thead {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #cccccc;
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:hover {
+            background-color: #eeeeee;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pendente {
+            background-color: #fff0cc;
+            color: #805b00;
+        }
+
+        .aprovado {
+            background-color: #d9ead3;
+            color: #274e13;
+        }
+
+        .reprovado {
+            background-color: #f4cccc;
+            color: #8e0e0e;
+        }
+
+        .botoes-validacao {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-aceitar {
+            background-color: #38761d;
+        }
+
+        .btn-aceitar:hover {
+            background-color: #274e13;
+        }
+
+        .btn-rejeitar {
+            background-color: #8e0e0e;
+        }
+
+        .btn-rejeitar:hover {
+            background-color: #6d0b0b;
+        }
+
+        .decisao {
+            font-weight: bold;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .decisao-aceita {
+            color: #38761d;
+        }
+
+        .decisao-rejeitada {
+            color: #8e0e0e;
+        }
+
+        .rodape {
+            margin-top: 20px;
+            color: #333333;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        /* Pop-up de confirmação */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.conteudo-visivel {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-conteudo h2 {
+            color: #272121;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-conteudo p {
+            color: #333333;
+            line-height: 1.5;
+        }
+
+        .modal-botoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancelar {
+            background-color: #cccccc;
+            color: #272121;
+        }
+
+        .btn-confirmar {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #272121;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5%;
+            }
+
+            .logo {
+                width: 180px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .caixa-tabela {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <img
+            src="../static/Logo.png"
+            alt="Logo da ETEC"
+            class="logo"
+        >
+
+        <header>
+            <h1>Análise de Pontos Eletrônicos</h1>
+
+            <p class="subtitulo">
+                Acompanhamento dos registros de ponto dos professores
+            </p>
+        </header>
+
+        <main class="caixa-tabela">
+
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome do professor</th>
+                            <th>Coordenação</th>
+                            <th>Status da análise</th>
+                            <th>Data e horário de criação</th>
+                            <th>Tipo de ponto</th>
+                            <th>Validar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Mariana Oliveira</td>
+                            <td>Informática</td>
+                            <td>
+                                <span class="status pendente" id="status-1">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>22/10/2026 08:15:32</td>
+                            <td>Entrada</td>
+                            <td id="validacao-1">
+                                <div class="botoes-validacao">
+                                    <button
+                                        type="button"
+                                        class="btn btn-aceitar"
+                                        onclick="solicitarConfirmacao(1, 'Aceitar', 'Mariana Oliveira')">
+                                        Aceitar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-rejeitar"
+                                        onclick="solicitarConfirmacao(1, 'Rejeitar', 'Mariana Oliveira')">
+                                        Rejeitar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Roberto Almeida</td>
+                            <td>Administração</td>
+                            <td>
+                                <span class="status pendente" id="status-2">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>21/10/2026 14:42:10</td>
+                            <td>Saída</td>
+                            <td id="validacao-2">
+                                <div class="botoes-validacao">
+                                    <button
+                                        type="button"
+                                        class="btn btn-aceitar"
+                                        onclick="solicitarConfirmacao(2, 'Aceitar', 'Roberto Almeida')">
+                                        Aceitar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-rejeitar"
+                                        onclick="solicitarConfirmacao(2, 'Rejeitar', 'Roberto Almeida')">
+                                        Rejeitar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Fernanda Santos</td>
+                            <td>Desenvolvimento de Sistemas</td>
+                            <td>
+                                <span class="status pendente" id="status-3">
+                                    Pendente
+                                </span>
+                            </td>
+                            <td>20/10/2026 09:30:45</td>
+                            <td>Entrada</td>
+                            <td id="validacao-3">
+                                <div class="botoes-validacao">
+                                    <button
+                                        type="button"
+                                        class="btn btn-aceitar"
+                                        onclick="solicitarConfirmacao(3, 'Aceitar', 'Fernanda Santos')">
+                                        Aceitar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-rejeitar"
+                                        onclick="solicitarConfirmacao(3, 'Rejeitar', 'Fernanda Santos')">
+                                        Rejeitar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="rodape">
+                Exibindo 3 registros de até 25 por página
+            </p>
+        </main>
+    </div>
+
+    <!-- Pop-up de confirmação -->
+    <div
+        class="modal"
+        id="modalConfirmacao"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloModal"
+        aria-describedby="mensagemConfirmacao">
+
+        <div class="modal-conteudo">
+            <h2 id="tituloModal">Confirmar decisão</h2>
+
+            <p id="mensagemConfirmacao"></p>
+
+            <div class="modal-botoes">
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    onclick="fecharModal()">
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-confirmar"
+                    id="btnConfirmar"
+                    onclick="confirmarDecisao()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let registroSelecionado = null;
+        let decisaoSelecionada = null;
+
+        function solicitarConfirmacao(id, decisao, professor) {
+            registroSelecionado = id;
+            decisaoSelecionada = decisao;
+
+            document.getElementById("mensagemConfirmacao").textContent =
+                `Deseja realmente ${decisao.toLowerCase()} o ponto de ${professor}?`;
+
+            document.getElementById("btnConfirmar").textContent =
+                `Confirmar ${decisao.toLowerCase()}`;
+
+            document.getElementById("modalConfirmacao")
+                .classList.add("conteudo-visivel");
+
+            document.getElementById("btnConfirmar").focus();
+        }
+
+        function fecharModal() {
+            document.getElementById("modalConfirmacao")
+                .classList.remove("conteudo-visivel");
+
+            registroSelecionado = null;
+            decisaoSelecionada = null;
+        }
+
+        function confirmarDecisao() {
+            if (
+                registroSelecionado === null ||
+                decisaoSelecionada === null
+            ) {
+                return;
+            }
+
+            const id = registroSelecionado;
+            const status = document.getElementById(`status-${id}`);
+            const validacao = document.getElementById(`validacao-${id}`);
+
+            if (decisaoSelecionada === "Aceitar") {
+                status.textContent = "Aprovado";
+                status.className = "status aprovado";
+
+                validacao.innerHTML =
+                    '<span class="decisao decisao-aceita">✓ Aceito</span>';
+            } else {
+                status.textContent = "Reprovado";
+                status.className = "status reprovado";
+
+                validacao.innerHTML =
+                    '<span class="decisao decisao-rejeitada">✕ Rejeitado</span>';
+            }
+
+            fecharModal();
+        }
+
+        document.getElementById("modalConfirmacao")
+            .addEventListener("click", function(event) {
+                if (event.target === this) {
+                    fecharModal();
+                }
+            });
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                fecharModal();
+            }
+        });
+    </script>
+</body>
+</html>
