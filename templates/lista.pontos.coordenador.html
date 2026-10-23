@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Apontamentos</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            min-height: 100vh;
+            padding: 3%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: block;
+            width: 220px;
+            max-width: 70%;
+            height: auto;
+            margin: 0 auto 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #272121;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .caixa-tabela {
+            background-color: #e6e6e6;
+            width: 100%;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .area-tabela {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        thead {
+            background-color: #8e0e0e;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #cccccc;
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:hover {
+            background-color: #eeeeee;
+        }
+
+        .botoes-validacao {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-confirmar {
+            background-color: #38761d;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #274e13;
+        }
+
+        .btn-negar {
+            background-color: #8e0e0e;
+        }
+
+        .btn-negar:hover {
+            background-color: #6d0b0b;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pendente {
+            background-color: #fff0cc;
+            color: #805b00;
+        }
+
+        .aprovado {
+            background-color: #d9ead3;
+            color: #274e13;
+        }
+
+        .reprovado {
+            background-color: #f4cccc;
+            color: #8e0e0e;
+        }
+
+        .rodape {
+            margin-top: 20px;
+            color: #333333;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        /* Pop-up de confirmação */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.conteudo-visivel {
+            display: flex;
+        }
+
+        .modal-conteudo {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-conteudo h2 {
+            color: #272121;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-conteudo p {
+            color: #333333;
+            line-height: 1.5;
+        }
+
+        .modal-botoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancelar {
+            background-color: #cccccc;
+            color: #272121;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #272121;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5%;
+            }
+
+            .logo {
+                width: 180px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .caixa-tabela {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <img src="../static/Logo.png" alt="Logo" class="logo">
+
+        <h1>Análise de Apontamentos</h1>
+
+        <p class="subtitulo">
+            Consulte e valide os apontamentos de presença dos professores.
+        </p>
+
+        <div class="caixa-tabela">
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Professor</th>
+                            <th>Horário do ponto</th>
+                            <th>Tipo de ponto</th>
+                            <th>Responsável pela análise</th>
+                            <th>Presença</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabelaApontamentos">
+                        <tr data-professor="Maria Silva">
+                            <td>Maria Silva</td>
+                            <td>07:28</td>
+                            <td>Entrada</td>
+                            <td>João Santos</td>
+                            <td></td>
+                            <td>
+                                <div class="botoes-validacao">
+                                    <button class="btn btn-confirmar"
+                                        onclick="solicitarDecisao(this, 'confirmar')">
+                                        Confirmar
+                                    </button>
+
+                                    <button class="btn btn-negar"
+                                        onclick="solicitarDecisao(this, 'negar')">
+                                        Negar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-professor="Pedro Oliveira">
+                            <td>Pedro Oliveira</td>
+                            <td>17:05</td>
+                            <td>Saída</td>
+                            <td>Ana Costa</td>
+                            <td></td>
+                            <td>
+                                <div class="botoes-validacao">
+                                    <button class="btn btn-confirmar"
+                                        onclick="solicitarDecisao(this, 'confirmar')">
+                                        Confirmar
+                                    </button>
+
+                                    <button class="btn btn-negar"
+                                        onclick="solicitarDecisao(this, 'negar')">
+                                        Negar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="rodape">
+            Apontamentos apresentados: <span id="totalApontamentos">2</span>
+        </div>
+    </div>
+
+    <!-- Pop-up de confirmação -->
+    <div class="modal" id="modalConfirmacao"
+         role="dialog" aria-modal="true"
+         aria-labelledby="tituloConfirmacao">
+
+        <div class="modal-conteudo">
+            <h2 id="tituloConfirmacao">Confirmar decisão</h2>
+
+            <p id="mensagemConfirmacao"></p>
+
+            <div class="modal-botoes">
+                <button type="button"
+                    class="btn btn-cancelar"
+                    onclick="fecharModal()">
+                    Cancelar
+                </button>
+
+                <button type="button"
+                    class="btn btn-confirmar"
+                    id="btnConfirmarAcao"
+                    onclick="executarDecisao()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let linhaSelecionada = null;
+        let decisaoSelecionada = null;
+
+        const modal = document.getElementById("modalConfirmacao");
+
+        function solicitarDecisao(botao, decisao) {
+            linhaSelecionada = botao.closest("tr");
+            decisaoSelecionada = decisao;
+
+            const professor =
+                linhaSelecionada.cells[0].textContent;
+
+            const horario =
+                linhaSelecionada.cells[1].textContent;
+
+            const tipo =
+                linhaSelecionada.cells[2].textContent;
+
+            if (decisao === "confirmar") {
+                document.getElementById("tituloConfirmacao")
+                    .textContent = "Confirmar apontamento";
+
+                document.getElementById("mensagemConfirmacao")
+                    .textContent =
+                    `Deseja confirmar o apontamento de ${tipo.toLowerCase()} de ${professor}, às ${horario}?`;
+
+                document.getElementById("btnConfirmarAcao")
+                    .textContent = "Confirmar";
+            } else {
+                document.getElementById("tituloConfirmacao")
+                    .textContent = "Negar apontamento";
+
+                document.getElementById("mensagemConfirmacao")
+                    .textContent =
+                    `Deseja realmente negar o apontamento de ${tipo.toLowerCase()} de ${professor} às ${horario}?`;
+
+                document.getElementById("btnConfirmarAcao")
+                    .textContent = "Negar";
+            }
+
+            const botaoConfirmacao =
+                document.getElementById("btnConfirmarAcao");
+
+            botaoConfirmacao.className =
+                decisao === "confirmar"
+                    ? "btn btn-confirmar"
+                    : "btn btn-negar";
+
+            modal.classList.add("conteudo-visivel");
+        }
+
+        function executarDecisao() {
+            if (!linhaSelecionada || !decisaoSelecionada) {
+                return;
+            }
+
+            const celulaAcoes = linhaSelecionada.cells[5];
+
+            const status = document.createElement("span");
+            status.classList.add("status");
+
+            if (decisaoSelecionada === "confirmar") {
+                status.classList.add("aprovado");
+                status.textContent = "Confirmado";
+            } else {
+                status.classList.add("reprovado");
+                status.textContent = "Negado";
+            }
+
+            const decisao = document.createElement("strong");
+            decisao.textContent =
+                decisaoSelecionada === "confirmar"
+                    ? "Apontamento confirmado"
+                    : "Apontamento negado";
+
+            celulaAcoes.replaceChildren(decisao);
+
+            fecharModal();
+            atualizarTotal();
+        }
+
+        function fecharModal() {
+            modal.classList.remove("conteudo-visivel");
+            linhaSelecionada = null;
+            decisaoSelecionada = null;
+        }
+
+        function atualizarTotal() {
+            document.getElementById("totalApontamentos").textContent =
+                document.querySelectorAll(
+                    "#tabelaApontamentos tr"
+                ).length;
+        }
+
+        modal.addEventListener("click", function(event) {
+            if (event.target === modal) {
+                fecharModal();
+            }
+        });
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                fecharModal();
+            }
+        });
+
+        atualizarTotal();
+    </script>
+</body>
+</html>
