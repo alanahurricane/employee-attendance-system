@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -56,7 +57,7 @@
 
         .cabecalho-tabela {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             margin-bottom: 18px;
         }
 
@@ -110,6 +111,15 @@
         .btn-adicionar {
             background-color: #38761d;
         }
+
+        #btn-voltarparalista {
+            background-color: #696666;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            }
 
         .btn-adicionar:hover {
             background-color: #274e13;
@@ -290,18 +300,27 @@
 
         <div class="caixa-tabela">
             <div class="cabecalho-tabela">
+                                              
+                <button
+                class="button" 
+                id="btn-voltarparalista"
+                onclick="window.location.href='/lista.pontos.coordenador'">
+                Voltar para lista de pontos
+                </button>
+
                 <button class="btn btn-adicionar" id="btnAdicionar">
                     + Adicionar professor
                 </button>
+
             </div>
 
             <div class="area-tabela">
                 <table>
                     <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Telefone</th>
                             <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>Nome</th>
                             <th>Coordenação</th>
                             <th>Ações</th>
                         </tr>
@@ -489,27 +508,61 @@
         }
 
         document.getElementById('btnConfirmarAcao')
-            .addEventListener('click', () => {
-                if (acaoPendente === 'adicionar') {
-                    professores.push(dadosPendentes);
-                }
+    .addEventListener('click', async () => {
 
-                if (acaoPendente === 'editar') {
-                    professores[indiceEdicao] = dadosPendentes;
-                }
+        if (acaoPendente === 'adicionar') {
+            const botao = document.getElementById('btnConfirmarAcao');
+            botao.disabled = true;
 
-                if (acaoPendente === 'excluir') {
-                    professores.splice(indiceEdicao, 1);
+            try {
+                const resposta = await fetch('/cadastrar-professor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(dadosPendentes)
+                });
+
+                if (!resposta.ok) {
+                    const erro = await resposta.text();
+                    alert(erro);
+                    return;
                 }
 
                 fecharModal(modalConfirmacao);
                 limparFormulario();
-                renderizarTabela();
 
                 acaoPendente = null;
                 dadosPendentes = null;
-            });
 
+                await carregarProfessores();
+
+            } catch (erro) {
+                alert('Não foi possível conectar ao servidor.');
+                console.error(erro);
+
+            } finally {
+                botao.disabled = false;
+            }
+
+            return;
+        }
+
+        if (acaoPendente === 'editar') {
+            professores[indiceEdicao] = dadosPendentes;
+        }
+
+        if (acaoPendente === 'excluir') {
+            professores.splice(indiceEdicao, 1);
+        }
+
+        fecharModal(modalConfirmacao);
+        limparFormulario();
+        renderizarTabela();
+
+        acaoPendente = null;
+        dadosPendentes = null;
+    });
         document.getElementById('btnCancelarConfirmacao')
             .addEventListener('click', () => {
                 fecharModal(modalConfirmacao);
@@ -577,6 +630,24 @@
                 professores.length;
         }
 
+        async function carregarProfessores() {
+    try {
+        const resposta = await fetch('/consultar-professor');
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao consultar professores.');
+        }
+
+        professores = dados;
+        renderizarTabela();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível carregar os professores.');
+    }
+}
+
         // Fecha os pop-ups ao clicar fora de seu conteúdo.
         [modalFormulario, modalConfirmacao].forEach(modal => {
             modal.addEventListener('click', event => {
@@ -609,7 +680,7 @@
             }
         });
 
-        renderizarTabela();
+        carregarProfessores();
     </script>
 </body>
 </html>
