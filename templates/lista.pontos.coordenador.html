@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -121,6 +121,15 @@
             background-color: #6d0b0b;
         }
 
+        #btn-gerenciarprofessores {
+            background-color: #696666;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         .status {
             display: inline-block;
             padding: 6px 10px;
@@ -145,8 +154,15 @@
             color: #8e0e0e;
         }
 
+        .acoes-rodape {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         .rodape {
-            margin-top: 20px;
+            margin-bottom: 0px;
             color: #333333;
             font-size: 0.85rem;
             text-align: right;
@@ -243,6 +259,17 @@
         <div class="caixa-tabela">
             <div class="area-tabela">
                 <table>
+                    
+        <div class="acoes-rodape">
+            <button
+            class="acoes-rodape"
+            id="btn-gerenciarprofessores"
+            onclick="window.location.href='/gerenciar.professores'">
+            Gerenciar professores
+            </button>
+        <div class="rodape">
+            Apontamentos apresentados: <span id="totalApontamentos">2</span>
+        </div>
                     <thead>
                         <tr>
                             <th>Professor</th>
@@ -299,10 +326,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-
-        <div class="rodape">
-            Apontamentos apresentados: <span id="totalApontamentos">2</span>
         </div>
     </div>
 
