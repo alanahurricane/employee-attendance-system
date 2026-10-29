@@ -68,7 +68,19 @@
             background-color: #545b62;
         }
 
-
+        button {
+            padding: 12px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        #baterponto {
+            background-color: #696666;
+            display: block;
+            margin: 25px auto;
+        }
 
     </style>
 </head>
@@ -108,7 +120,12 @@
         </tbody>
     </table>
 
-    <a href="/" class="voltar">Voltar ao ponto eletrônico</a>
+    <button
+        type="button"
+        id="baterponto"
+        onclick="window.location.href='/bater.ponto'">
+        Voltar ao ponto eletrônico
+    </button>
 
 </body>
 </html>
