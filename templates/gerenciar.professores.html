@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -402,6 +401,7 @@
         let indiceEdicao = null;
         let acaoPendente = null;
         let dadosPendentes = null;
+        let emailAntigo = null;
 
         const modalFormulario = document.getElementById('modalFormulario');
         const modalConfirmacao = document.getElementById('modalConfirmacao');
@@ -478,6 +478,8 @@
             indiceEdicao = indice;
             const professor = professores[indice];
 
+            emailAntigo = professor.email;
+
             campos.nome.value = professor.nome;
             campos.telefone.value = professor.telefone;
             campos.email.value = professor.email;
@@ -488,7 +490,7 @@
 
             abrirModal(modalFormulario);
             campos.nome.focus();
-        }
+}
 
         function excluirProfessor(indice) {
             const professor = professores[indice];
@@ -547,14 +549,85 @@
 
             return;
         }
+        
+if (acaoPendente === 'editar') {
+    const botao = document.getElementById('btnConfirmarAcao');
+    botao.disabled = true;
 
-        if (acaoPendente === 'editar') {
-            professores[indiceEdicao] = dadosPendentes;
+    try {
+        dadosPendentes.email_antigo = emailAntigo;
+
+        const resposta = await fetch('/editar-professor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(dadosPendentes)
+        });
+
+        if (!resposta.ok) {
+            const erro = await resposta.text();
+            alert(erro);
+            return;
         }
 
-        if (acaoPendente === 'excluir') {
-            professores.splice(indiceEdicao, 1);
+        fecharModal(modalConfirmacao);
+        limparFormulario();
+
+        acaoPendente = null;
+        dadosPendentes = null;
+        emailAntigo = null;
+
+        await carregarProfessores();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível editar o professor.');
+
+    } finally {
+        botao.disabled = false;
+    }
+
+    return;
+}
+
+if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para excluir o professor
+    const botao = document.getElementById('btnConfirmarAcao');
+    botao.disabled = true;
+
+    try {
+        const email = professores[indiceEdicao].email;
+
+        const resposta = await fetch('/excluir-professor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ email: email })
+        });
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao excluir professor.');
         }
+
+        fecharModal(modalConfirmacao);
+
+        acaoPendente = null;
+        indiceEdicao = null;
+        dadosPendentes = null;
+
+        await carregarProfessores();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível excluir o professor.');
+
+    } finally {
+        botao.disabled = false;
+    }
+
+    return;
+}
 
         fecharModal(modalConfirmacao);
         limparFormulario();
@@ -594,9 +667,9 @@
                 professores.forEach((professor, indice) => {
                     const linha = document.createElement('tr');
 
-                    linha.appendChild(criarCelula(professor.nome));
-                    linha.appendChild(criarCelula(professor.telefone));
                     linha.appendChild(criarCelula(professor.email));
+                    linha.appendChild(criarCelula(professor.telefone));
+                    linha.appendChild(criarCelula(professor.nome));
                     linha.appendChild(criarCelula(professor.coordenacao));
 
                     const celulaAcoes = document.createElement('td');
@@ -680,6 +753,10 @@
             }
         });
 
+        carregarProfessores();
+    </script>
+</body>
+</html>
         carregarProfessores();
     </script>
 </body>
