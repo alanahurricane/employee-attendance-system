@@ -106,25 +106,75 @@
                 obterHoraBrasilia();
         }
 
-        function baterEntrada() {
+        async function baterEntrada() { // esse código é vulnerável porque depende do html que pode ser manipulado pelo usuário
             const hora = obterHoraBrasilia();
+            const dados = {
+                data_criacao: hora,
+                status: "Em análise",
+                tipo_ponto: "Entrada",
+                criador: "Nome do professor",
+                responsavel: "Bruno Mars"
+            };
 
-            document.getElementById("mensagem").textContent =
+            try {
+                const resposta = await fetch('/create-ponto', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(dados)
+                });
+
+                if (!resposta.ok) {const erro = await resposta.text();
+                    alert(erro);
+                    return;
+                }
+            
+        document.getElementById("mensagem").textContent =
                 "Entrada registada às " + hora + "!";
-
             document.getElementById("entrada").disabled = true;
             document.getElementById("saida").disabled = false;
-        }
+            }
+            catch (erro) {
+        console.error(erro);
+        alert("Não foi possível registrar a entrada.");
+    }
+}
 
-        function baterSaida() {
+        async function baterSaida() { // esse código é vulnerável porque depende do html que pode ser manipulado pelo usuário
             const hora = obterHoraBrasilia();
+            const dados = {
+                data_criacao: hora,
+                status: "Em análise",
+                tipo_ponto: "Saída",
+                criador: "Nome do professor",
+                responsavel: "Bruno Mars"
+            };
 
-            document.getElementById("mensagem").textContent =
+            try {
+                const resposta = await fetch('/create-ponto', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(dados)
+                });
+
+                if (!resposta.ok) {const erro = await resposta.text();
+                    alert(erro);
+                    return;
+                }
+            
+        document.getElementById("mensagem").textContent =
                 "Saída registada às " + hora + "!";
-
-            document.getElementById("saida").disabled = true;
             document.getElementById("entrada").disabled = false;
-        }
+            document.getElementById("saida").disabled = true;
+            }
+            catch (erro) {
+        console.error(erro);
+        alert("Não foi possível registrar a saída.");
+    }
+}
 
         atualizarHora();
         setInterval(atualizarHora, 1000);
@@ -137,6 +187,9 @@
         Meu histórico
     </button>
 
+</div>
+</body>
+</html>
 </div>
 
 </body>
