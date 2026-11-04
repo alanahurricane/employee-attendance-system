@@ -245,6 +245,7 @@
 
 <body>
     <div class="container">
+
         <img
             src="../static/Logo.png"
             alt="Logo da ETEC"
@@ -253,12 +254,14 @@
 
         <header>
             <h1>Análise de Pontos Eletrônicos</h1>
+
             <p class="subtitulo">
                 Acompanhamento dos registros de ponto dos professores
             </p>
         </header>
 
         <main class="caixa-tabela">
+
             <div class="area-tabela">
                 <table>
                     <thead>
@@ -272,109 +275,22 @@
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody id="tabelaPontos">
                         <tr>
-                            <td>Mariana Oliveira</td>
-                            <td>Informática</td>
-                            <td>
-                                <span class="status pendente" id="status-1">
-                                    Pendente
-                                </span>
-                            </td>
-                            <td>22/10/2026 08:15:32</td>
-                            <td>Entrada</td>
-                            <td id="apontamento-1">
-                                <div class="botoes-apontamento">
-                                    <button type="button"
-                                        class="btn btn-presente"
-                                        onclick="solicitarConfirmacao(1, 'Presente', 'Mariana Oliveira')">
-                                        Presente
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-atraso"
-                                        onclick="solicitarConfirmacao(1, 'Atraso', 'Mariana Oliveira')">
-                                        Atraso
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-falta"
-                                        onclick="solicitarConfirmacao(1, 'Falta', 'Mariana Oliveira')">
-                                        Falta
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>Roberto Almeida</td>
-                            <td>Administração</td>
-                            <td>
-                                <span class="status pendente" id="status-2">
-                                    Pendente
-                                </span>
-                            </td>
-                            <td>21/10/2026 14:42:10</td>
-                            <td>Saída</td>
-                            <td id="apontamento-2">
-                                <div class="botoes-apontamento">
-                                    <button type="button"
-                                        class="btn btn-presente"
-                                        onclick="solicitarConfirmacao(2, 'Presente', 'Roberto Almeida')">
-                                        Presente
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-atraso"
-                                        onclick="solicitarConfirmacao(2, 'Atraso', 'Roberto Almeida')">
-                                        Atraso
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-falta"
-                                        onclick="solicitarConfirmacao(2, 'Falta', 'Roberto Almeida')">
-                                        Falta
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>Fernanda Santos</td>
-                            <td>Desenvolvimento de Sistemas</td>
-                            <td>
-                                <span class="status pendente" id="status-3">
-                                    Pendente
-                                </span>
-                            </td>
-                            <td>20/10/2026 09:30:45</td>
-                            <td>Entrada</td>
-                            <td id="apontamento-3">
-                                <div class="botoes-apontamento">
-                                    <button type="button"
-                                        class="btn btn-presente"
-                                        onclick="solicitarConfirmacao(3, 'Presente', 'Fernanda Santos')">
-                                        Presente
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-atraso"
-                                        onclick="solicitarConfirmacao(3, 'Atraso', 'Fernanda Santos')">
-                                        Atraso
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-falta"
-                                        onclick="solicitarConfirmacao(3, 'Falta', 'Fernanda Santos')">
-                                        Falta
-                                    </button>
-                                </div>
-                            </td>
+                            <td colspan="6">Carregando pontos...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <p class="rodape">
-                Exibindo 3 registros de até 25 por página
+                Exibindo <span id="totalPontos">0</span> registros
             </p>
+
         </main>
     </div>
 
+    <!-- Modal de confirmação -->
     <div
         class="modal"
         id="modalConfirmacao"
@@ -384,11 +300,13 @@
         aria-describedby="mensagemConfirmacao">
 
         <div class="modal-conteudo">
+
             <h2 id="tituloModal">Confirmar apontamento</h2>
 
             <p id="mensagemConfirmacao"></p>
 
             <div class="modal-botoes">
+
                 <button
                     type="button"
                     class="btn btn-cancelar"
@@ -402,34 +320,206 @@
                     onclick="confirmarApontamento()">
                     Confirmar
                 </button>
+
             </div>
         </div>
     </div>
 
     <script>
+        let pontos = [];
+
         let registroSelecionado = null;
         let apontamentoSelecionado = null;
 
+        // Cria uma célula da tabela
+        function criarCelula(valor) {
+            const celula = document.createElement('td');
+            celula.textContent = valor ?? '-';
+
+            return celula;
+        }
+
+        // Renderiza os pontos recebidos do servidor
+        function renderizarTabela() {
+            const tabela = document.getElementById('tabelaPontos');
+
+            tabela.replaceChildren();
+
+            if (pontos.length === 0) {
+                const linha = document.createElement('tr');
+                const celula = document.createElement('td');
+
+                celula.colSpan = 6;
+                celula.className = 'vazio';
+                celula.textContent = 'Nenhum ponto cadastrado.';
+
+                linha.appendChild(celula);
+                tabela.appendChild(linha);
+
+            } else {
+
+                pontos.forEach(ponto => {
+
+                    const linha = document.createElement('tr');
+
+                    // Nome do professor
+                    linha.appendChild(
+                        criarCelula(ponto.criador)
+                    );
+
+                    // Coordenação: não existe no banco atualmente
+                    linha.appendChild(
+                        criarCelula('-')
+                    );
+
+                    // Status da análise
+                    const celulaStatus = document.createElement('td');
+                    const status = document.createElement('span');
+
+                    status.id = `status-${ponto.id}`;
+                    status.className = 'status pendente';
+                    status.textContent = ponto.status || 'Pendente';
+
+                    if (
+                        ponto.status &&
+                        ponto.status.toLowerCase().includes('analisado')
+                    ) {
+                        status.className = 'status analisado';
+                    }
+
+                    celulaStatus.appendChild(status);
+                    linha.appendChild(celulaStatus);
+
+                    // Data e horário de criação
+                    linha.appendChild(
+                        criarCelula(ponto.data_criacao)
+                    );
+
+                    // Tipo de ponto
+                    linha.appendChild(
+                        criarCelula(ponto.tipo_ponto)
+                    );
+
+                    // Apontamento
+                    const celulaApontamento =
+                        document.createElement('td');
+
+                    celulaApontamento.id =
+                        `apontamento-${ponto.id}`;
+
+                    // Cria os três botões
+                    const botoes = document.createElement('div');
+                    botoes.className = 'botoes-apontamento';
+
+                    const opcoes = [
+                        {
+                            texto: 'Presente',
+                            classe: 'btn-presente'
+                        },
+                        {
+                            texto: 'Atraso',
+                            classe: 'btn-atraso'
+                        },
+                        {
+                            texto: 'Falta',
+                            classe: 'btn-falta'
+                        }
+                    ];
+
+                    opcoes.forEach(opcao => {
+
+                        const botao = document.createElement('button');
+
+                        botao.type = 'button';
+                        botao.className = `btn ${opcao.classe}`;
+                        botao.textContent = opcao.texto;
+
+                        botao.addEventListener('click', () => {
+                            solicitarConfirmacao(
+                                ponto.id,
+                                opcao.texto,
+                                ponto.criador
+                            );
+                        });
+
+                        botoes.appendChild(botao);
+                    });
+
+                    celulaApontamento.appendChild(botoes);
+                    linha.appendChild(celulaApontamento);
+
+                    tabela.appendChild(linha);
+                });
+            }
+
+            document.getElementById('totalPontos').textContent =
+                pontos.length;
+        }
+
+        // Consulta os pontos no servidor
+        async function carregarPontos() {
+            const tabela = document.getElementById('tabelaPontos');
+
+            try {
+                const resposta = await fetch('/consultar-pontos');
+
+                if (!resposta.ok) {
+                    throw new Error('Erro ao consultar pontos.');
+                }
+
+                const dados = await resposta.json();
+
+                if (!Array.isArray(dados)) {
+                    throw new Error('Resposta inválida do servidor.');
+                }
+
+                pontos = dados;
+
+                renderizarTabela();
+
+            } catch (erro) {
+                console.error('Erro ao carregar pontos:', erro);
+
+                tabela.replaceChildren();
+
+                const linha = document.createElement('tr');
+                const celula = document.createElement('td');
+
+                celula.colSpan = 6;
+                celula.textContent =
+                    'Não foi possível carregar os pontos.';
+
+                linha.appendChild(celula);
+                tabela.appendChild(linha);
+            }
+        }
+
+        // Abre o modal
         function solicitarConfirmacao(id, apontamento, professor) {
+
             registroSelecionado = id;
             apontamentoSelecionado = apontamento;
 
-            document.getElementById("mensagemConfirmacao").textContent =
+            document.getElementById('mensagemConfirmacao').textContent =
                 `Deseja realmente registrar "${apontamento}" para ${professor}?`;
 
-            document.getElementById("modalConfirmacao")
-                .classList.add("conteudo-visivel");
+            document.getElementById('modalConfirmacao')
+                .classList.add('conteudo-visivel');
         }
 
+        // Fecha o modal
         function fecharModal() {
-            document.getElementById("modalConfirmacao")
-                .classList.remove("conteudo-visivel");
+
+            document.getElementById('modalConfirmacao')
+                .classList.remove('conteudo-visivel');
 
             registroSelecionado = null;
             apontamentoSelecionado = null;
         }
 
+        // Confirma visualmente o apontamento
         function confirmarApontamento() {
+
             if (
                 registroSelecionado === null ||
                 apontamentoSelecionado === null
@@ -440,16 +530,18 @@
             const id = registroSelecionado;
 
             const status = document.getElementById(`status-${id}`);
-            status.textContent = "Analisado pelo agente";
-            status.className = "status analisado";
+
+            status.textContent = 'Analisado pelo agente';
+            status.className = 'status analisado';
 
             const celulaApontamento =
                 document.getElementById(`apontamento-${id}`);
 
             celulaApontamento.replaceChildren();
 
-            const resultado = document.createElement("span");
-            resultado.className = "decisao";
+            const resultado = document.createElement('span');
+
+            resultado.className = 'decisao';
             resultado.textContent = apontamentoSelecionado;
 
             celulaApontamento.appendChild(resultado);
@@ -457,22 +549,29 @@
             fecharModal();
         }
 
-        document.getElementById("modalConfirmacao")
-            .addEventListener("click", function(event) {
+        // Fecha ao clicar fora do modal
+        document.getElementById('modalConfirmacao')
+            .addEventListener('click', function(event) {
+
                 if (event.target === this) {
                     fecharModal();
                 }
             });
 
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "Escape") {
+        // Fecha ao pressionar ESC
+        document.addEventListener('keydown', function(event) {
+
+            if (event.key === 'Escape') {
                 fecharModal();
             }
         });
+
+        // Carrega os pontos ao abrir a página
+        document.addEventListener(
+            'DOMContentLoaded',
+            carregarPontos
+        );
     </script>
-</body>
-</html>
-        });
-    </script>
+
 </body>
 </html>
