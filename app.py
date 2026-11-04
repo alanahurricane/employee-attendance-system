@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify # usa flask pra poder navegar nas páginas e no banco de dados
 from users import create_professor, get_professores, erase_professor, edit_professor
+from ponto import create_ponto, get_pontos
 import sqlite3
 app = Flask(__name__)
 
@@ -57,6 +58,26 @@ def excluir_professor():
     erase_professor(email)
 
     return '', 204
+
+@app.route ('/create-ponto', methods=['POST']) # rota para criar ponto
+def cadastrar_ponto ():
+    data_criacao = request.form.get('data_criacao', '').strip()
+    status = request.form.get('status', '').strip()
+    tipo_ponto = request.form.get('tipo_ponto', '').strip()
+    
+    if not data_criacao or not status or not tipo_ponto:
+        return "Nem todos os campos foram preenchidos pelo servidor", 400
+
+    try:
+        create_ponto(data_criacao, status, tipo_ponto)
+    except sqlite3.IntegrityError:
+        return "Não foi possível criar o ponto"
+    return '', 204
+
+@app.route('/consultar-pontos', methods=['GET']) # caminho para consultar os pontos
+def consultar_pontos():
+    pontos = get_pontos()
+    return jsonify(pontos)
 
 # listas de mudanças de página
 @app.route('/login')
