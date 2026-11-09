@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -104,19 +103,18 @@
         </thead>
 
         <tbody>
-            <tr>
-                <td>19/10/2026</td>
-                <td>08:00:00</td>
-                <td>Entrada</td>
-                <td class="status">Em análise</td>
-            </tr>
-
-            <tr>
-                <td>19/10/2026</td>
-                <td>12:00:00</td>
-                <td>Saída</td>
-                <td class="status">Em análise</td>
-            </tr>
+            {% for ponto in pontos %}
+                <tr>
+                    <td>{{ ponto.data }}</td>
+                    <td>{{ ponto.hora }}</td>
+                    <td>{{ ponto.tipo_ponto }}</td>
+                    <td class="status">{{ ponto.status }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">Você ainda não possui registros de ponto.</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 
