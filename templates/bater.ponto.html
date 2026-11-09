@@ -94,12 +94,18 @@
     <p id="mensagem"></p>
 
     <script>
-        function obterHoraBrasilia() {
-            return new Date().toLocaleTimeString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-                hour12: false
-            });
-        }
+function obterHoraBrasilia() {
+    return new Date().toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
+}
 
         function atualizarHora() {
             document.getElementById("hora").textContent =
@@ -188,9 +194,5 @@
     </button>
 
 </div>
-</body>
-</html>
-</div>
-
 </body>
 </html>
