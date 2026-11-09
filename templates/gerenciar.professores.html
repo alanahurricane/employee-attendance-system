@@ -118,7 +118,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            }
+        }
 
         .btn-adicionar:hover {
             background-color: #274e13;
@@ -159,7 +159,6 @@
             padding: 25px;
         }
 
-        /* Pop-ups */
         .modal {
             display: none;
             position: fixed;
@@ -288,10 +287,8 @@
 <body>
     <div class="container">
 
-    <img src="../static/Logo.png"
-     alt="Logo"
-     class="logo">
-    
+        <img src="../static/Logo.png" alt="Logo" class="logo">
+
         <h1>Gestão de Professores</h1>
         <p class="subtitulo">
             Consulte, adicione, edite ou remova professores.
@@ -299,12 +296,12 @@
 
         <div class="caixa-tabela">
             <div class="cabecalho-tabela">
-                                              
+
                 <button
-                class="button" 
-                id="btn-voltarparalista"
-                onclick="window.location.href='/lista.pontos.coordenador'">
-                Voltar para lista de pontos
+                    class="button"
+                    id="btn-voltarparalista"
+                    onclick="window.location.href='/lista.pontos.coordenador'">
+                    Voltar para lista de pontos
                 </button>
 
                 <button class="btn btn-adicionar" id="btnAdicionar">
@@ -337,10 +334,12 @@
     <!-- Modal para adicionar ou editar professor -->
     <div class="modal" id="modalFormulario" role="dialog"
          aria-modal="true" aria-labelledby="tituloFormulario">
+
         <div class="modal-conteudo">
             <h2 id="tituloFormulario">Adicionar professor</h2>
 
             <form id="formProfessor">
+
                 <div class="campo">
                     <label for="nome">Nome completo</label>
                     <input type="text" id="nome" name="nome"
@@ -365,15 +364,24 @@
                            required>
                 </div>
 
+                <div class="campo" id="campoSenha">
+                    <label for="senha">Senha provisória</label>
+                    <input type="password" id="senha" name="senha"
+                           autocomplete="new-password"
+                           minlength="8" required>
+                </div>
+
                 <div class="modal-botoes">
                     <button type="button" class="btn btn-cancelar"
                             id="btnCancelarFormulario">
                         Cancelar
                     </button>
+
                     <button type="submit" class="btn btn-confirmar">
                         Continuar
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -381,6 +389,7 @@
     <!-- Modal de confirmação -->
     <div class="modal" id="modalConfirmacao" role="alertdialog"
          aria-modal="true" aria-labelledby="tituloConfirmacao">
+
         <div class="modal-conteudo">
             <h2 id="tituloConfirmacao">Confirmar ação</h2>
             <p id="mensagemConfirmacao"></p>
@@ -389,6 +398,7 @@
                 <button class="btn btn-cancelar" id="btnCancelarConfirmacao">
                     Cancelar
                 </button>
+
                 <button class="btn btn-confirmar" id="btnConfirmarAcao">
                     Confirmar
                 </button>
@@ -406,12 +416,14 @@
         const modalFormulario = document.getElementById('modalFormulario');
         const modalConfirmacao = document.getElementById('modalConfirmacao');
         const formProfessor = document.getElementById('formProfessor');
+        const campoSenha = document.getElementById('campoSenha');
 
         const campos = {
             nome: document.getElementById('nome'),
             telefone: document.getElementById('telefone'),
             email: document.getElementById('email'),
-            coordenacao: document.getElementById('coordenacao')
+            coordenacao: document.getElementById('coordenacao'),
+            senha: document.getElementById('senha')
         };
 
         function abrirModal(modal) {
@@ -429,6 +441,10 @@
 
         document.getElementById('btnAdicionar').addEventListener('click', () => {
             limparFormulario();
+
+            campoSenha.style.display = 'block';
+            campos.senha.required = true;
+
             document.getElementById('tituloFormulario').textContent =
                 'Adicionar professor';
 
@@ -453,19 +469,28 @@
             };
 
             if (indiceEdicao === null) {
+                dadosPendentes.senha = campos.senha.value;
+
                 acaoPendente = 'adicionar';
+
                 document.getElementById('tituloConfirmacao').textContent =
                     'Confirmar cadastro';
+
                 document.getElementById('mensagemConfirmacao').textContent =
                     `Deseja adicionar ${dadosPendentes.nome} à lista de professores?`;
+
                 document.getElementById('btnConfirmarAcao').textContent =
                     'Adicionar';
+
             } else {
                 acaoPendente = 'editar';
+
                 document.getElementById('tituloConfirmacao').textContent =
                     'Confirmar alterações';
+
                 document.getElementById('mensagemConfirmacao').textContent =
                     `Deseja salvar as alterações dos dados de ${dadosPendentes.nome}?`;
+
                 document.getElementById('btnConfirmarAcao').textContent =
                     'Salvar alterações';
             }
@@ -485,12 +510,16 @@
             campos.email.value = professor.email;
             campos.coordenacao.value = professor.coordenacao;
 
+            campoSenha.style.display = 'none';
+            campos.senha.required = false;
+            campos.senha.value = '';
+
             document.getElementById('tituloFormulario').textContent =
                 'Editar professor';
 
             abrirModal(modalFormulario);
             campos.nome.focus();
-}
+        }
 
         function excluirProfessor(indice) {
             const professor = professores[indice];
@@ -501,8 +530,10 @@
 
             document.getElementById('tituloConfirmacao').textContent =
                 'Excluir professor';
+
             document.getElementById('mensagemConfirmacao').textContent =
                 `Tem certeza de que deseja excluir ${professor.nome}? Esta ação não poderá ser desfeita.`;
+
             document.getElementById('btnConfirmarAcao').textContent =
                 'Excluir';
 
@@ -510,132 +541,133 @@
         }
 
         document.getElementById('btnConfirmarAcao')
-    .addEventListener('click', async () => {
+            .addEventListener('click', async () => {
 
-        if (acaoPendente === 'adicionar') {
-            const botao = document.getElementById('btnConfirmarAcao');
-            botao.disabled = true;
+                if (acaoPendente === 'adicionar') {
+                    const botao = document.getElementById('btnConfirmarAcao');
+                    botao.disabled = true;
 
-            try {
-                const resposta = await fetch('/cadastrar-professor', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(dadosPendentes)
-                });
+                    try {
+                        const resposta = await fetch('/cadastrar-professor', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(dadosPendentes)
+                        });
 
-                if (!resposta.ok) {
-                    const erro = await resposta.text();
-                    alert(erro);
+                        if (!resposta.ok) {
+                            const erro = await resposta.text();
+                            alert(erro);
+                            return;
+                        }
+
+                        fecharModal(modalConfirmacao);
+                        limparFormulario();
+
+                        acaoPendente = null;
+                        dadosPendentes = null;
+
+                        await carregarProfessores();
+
+                    } catch (erro) {
+                        alert('Não foi possível conectar ao servidor.');
+                        console.error(erro);
+
+                    } finally {
+                        botao.disabled = false;
+                    }
+
+                    return;
+                }
+
+                if (acaoPendente === 'editar') {
+                    const botao = document.getElementById('btnConfirmarAcao');
+                    botao.disabled = true;
+
+                    try {
+                        dadosPendentes.email_antigo = emailAntigo;
+
+                        const resposta = await fetch('/editar-professor', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(dadosPendentes)
+                        });
+
+                        if (!resposta.ok) {
+                            const erro = await resposta.text();
+                            alert(erro);
+                            return;
+                        }
+
+                        fecharModal(modalConfirmacao);
+                        limparFormulario();
+
+                        acaoPendente = null;
+                        dadosPendentes = null;
+                        emailAntigo = null;
+
+                        await carregarProfessores();
+
+                    } catch (erro) {
+                        console.error(erro);
+                        alert('Não foi possível editar o professor.');
+
+                    } finally {
+                        botao.disabled = false;
+                    }
+
+                    return;
+                }
+
+                if (acaoPendente === 'excluir') {
+                    const botao = document.getElementById('btnConfirmarAcao');
+                    botao.disabled = true;
+
+                    try {
+                        const email = professores[indiceEdicao].email;
+
+                        const resposta = await fetch('/excluir-professor', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams({ email: email })
+                        });
+
+                        if (!resposta.ok) {
+                            throw new Error('Erro ao excluir professor.');
+                        }
+
+                        fecharModal(modalConfirmacao);
+
+                        acaoPendente = null;
+                        indiceEdicao = null;
+                        dadosPendentes = null;
+
+                        await carregarProfessores();
+
+                    } catch (erro) {
+                        console.error(erro);
+                        alert('Não foi possível excluir o professor.');
+
+                    } finally {
+                        botao.disabled = false;
+                    }
+
                     return;
                 }
 
                 fecharModal(modalConfirmacao);
                 limparFormulario();
+                renderizarTabela();
 
                 acaoPendente = null;
                 dadosPendentes = null;
+            });
 
-                await carregarProfessores();
-
-            } catch (erro) {
-                alert('Não foi possível conectar ao servidor.');
-                console.error(erro);
-
-            } finally {
-                botao.disabled = false;
-            }
-
-            return;
-        }
-        
-if (acaoPendente === 'editar') {
-    const botao = document.getElementById('btnConfirmarAcao');
-    botao.disabled = true;
-
-    try {
-        dadosPendentes.email_antigo = emailAntigo;
-
-        const resposta = await fetch('/editar-professor', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams(dadosPendentes)
-        });
-
-        if (!resposta.ok) {
-            const erro = await resposta.text();
-            alert(erro);
-            return;
-        }
-
-        fecharModal(modalConfirmacao);
-        limparFormulario();
-
-        acaoPendente = null;
-        dadosPendentes = null;
-        emailAntigo = null;
-
-        await carregarProfessores();
-
-    } catch (erro) {
-        console.error(erro);
-        alert('Não foi possível editar o professor.');
-
-    } finally {
-        botao.disabled = false;
-    }
-
-    return;
-}
-
-if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para excluir o professor
-    const botao = document.getElementById('btnConfirmarAcao');
-    botao.disabled = true;
-
-    try {
-        const email = professores[indiceEdicao].email;
-
-        const resposta = await fetch('/excluir-professor', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ email: email })
-        });
-
-        if (!resposta.ok) {
-            throw new Error('Erro ao excluir professor.');
-        }
-
-        fecharModal(modalConfirmacao);
-
-        acaoPendente = null;
-        indiceEdicao = null;
-        dadosPendentes = null;
-
-        await carregarProfessores();
-
-    } catch (erro) {
-        console.error(erro);
-        alert('Não foi possível excluir o professor.');
-
-    } finally {
-        botao.disabled = false;
-    }
-
-    return;
-}
-
-        fecharModal(modalConfirmacao);
-        limparFormulario();
-        renderizarTabela();
-
-        acaoPendente = null;
-        dadosPendentes = null;
-    });
         document.getElementById('btnCancelarConfirmacao')
             .addEventListener('click', () => {
                 fecharModal(modalConfirmacao);
@@ -663,6 +695,7 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
 
                 linha.appendChild(celula);
                 tabela.appendChild(linha);
+
             } else {
                 professores.forEach((professor, indice) => {
                     const linha = document.createElement('tr');
@@ -680,6 +713,7 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
                     btnEditar.type = 'button';
                     btnEditar.className = 'btn btn-editar';
                     btnEditar.textContent = 'Editar';
+
                     btnEditar.addEventListener('click', () => {
                         editarProfessor(indice);
                     });
@@ -688,6 +722,7 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
                     btnExcluir.type = 'button';
                     btnExcluir.className = 'btn btn-excluir';
                     btnExcluir.textContent = 'Excluir';
+
                     btnExcluir.addEventListener('click', () => {
                         excluirProfessor(indice);
                     });
@@ -704,24 +739,24 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
         }
 
         async function carregarProfessores() {
-    try {
-        const resposta = await fetch('/consultar-professor');
-        const dados = await resposta.json();
+            try {
+                const resposta = await fetch('/consultar-professor');
 
-        if (!resposta.ok) {
-            throw new Error('Erro ao consultar professores.');
+                if (!resposta.ok) {
+                    throw new Error('Erro ao consultar professores.');
+                }
+
+                const dados = await resposta.json();
+
+                professores = dados;
+                renderizarTabela();
+
+            } catch (erro) {
+                console.error(erro);
+                alert('Não foi possível carregar os professores.');
+            }
         }
 
-        professores = dados;
-        renderizarTabela();
-
-    } catch (erro) {
-        console.error(erro);
-        alert('Não foi possível carregar os professores.');
-    }
-}
-
-        // Fecha os pop-ups ao clicar fora de seu conteúdo.
         [modalFormulario, modalConfirmacao].forEach(modal => {
             modal.addEventListener('click', event => {
                 if (event.target === modal) {
@@ -739,13 +774,13 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
             });
         });
 
-        // Fecha o pop-up com a tecla Escape.
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') {
                 if (modalConfirmacao.classList.contains('conteudo-visivel')) {
                     fecharModal(modalConfirmacao);
                     acaoPendente = null;
                     dadosPendentes = null;
+
                 } else if (modalFormulario.classList.contains('conteudo-visivel')) {
                     fecharModal(modalFormulario);
                     limparFormulario();
@@ -753,10 +788,6 @@ if (acaoPendente === 'excluir') { // envia solicitação ao banco de dados para 
             }
         });
 
-        carregarProfessores();
-    </script>
-</body>
-</html>
         carregarProfessores();
     </script>
 </body>
