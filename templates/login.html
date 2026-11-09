@@ -117,17 +117,22 @@
         <main class="caixa-login">
 
             <h1>Login</h1>
+                {% if erro %}
+                    <p style="color: #8e0e0e; text-align: center;">
+                        {{ erro }}
+                    </p>
+                {% endif %}
 
             <form method="POST" action="/login">
-
-                <label for="usuario">E-mail:</label>
+                
+                <label for="email">E-mail:</label>
                 <input
-                    type="text"
-                    id="usuario"
-                    name="usuario"
-                    autocomplete="username"
+                    type="email"
+                    id="email"
+                    name="email"
+                    auto complete="username"
                     required
-                >
+>
 
                 <label for="senha">Senha:</label>
                 <input
